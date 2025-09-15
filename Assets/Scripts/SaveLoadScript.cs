@@ -27,6 +27,7 @@ public class SaveLoadScript : MonoBehaviour
 
     public void OnSaveClick()
     {
-
+        GoogleDriveTools.Upload(_enteredText.text);
+        Debug.Log("Saved");
     }
 }

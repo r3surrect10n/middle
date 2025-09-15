@@ -13,7 +13,7 @@ public static class GoogleDriveTools
         return output;
     }
 
-    public static File Upload(String obj, Action onDone)
+    public static File Upload(String obj)
     {
         var file = new UnityGoogleDrive.Data.File { Name = "GameData.json", Content = Encoding.ASCII.GetBytes(obj) };
         GoogleDriveFiles.Create(file).Send();

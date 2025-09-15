@@ -538,7 +538,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 440347550}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 945513822}
+        m_TargetAssemblyTypeName: SaveLoadScript, Assembly-CSharp
+        m_MethodName: OnSaveClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &440347550
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1022,10 +1034,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65975438329e97245877549caf02233a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _textField: {fileID: 0}
-  _numField: {fileID: 0}
-  _enteredText: {fileID: 0}
-  _enteredNums: {fileID: 0}
+  _textField: {fileID: 2049341322}
+  _numField: {fileID: 560149627}
+  _enteredText: {fileID: 1042759485}
+  _enteredNums: {fileID: 1528672161}
   _loadedText: {fileID: 1042759485}
   _loadedNums: {fileID: 1528672161}
 --- !u!1 &1042759482
