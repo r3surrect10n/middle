@@ -9,7 +9,7 @@ public class SaveLoadScript : MonoBehaviour
     [SerializeField] private Text _enteredText;
     [SerializeField] private Text _enteredNums;
     [SerializeField] private Text _loadedText;
-    [SerializeField] private Text _loadedNums;    
+    [SerializeField] private Text _loadedNums;   
 
     private void Start()
     { 
@@ -18,11 +18,18 @@ public class SaveLoadScript : MonoBehaviour
             _loadedText.text = "Данные отсутствуют";
             _loadedNums.text = "Данные отсутствуют";
         }
+        else
+        {
+
+        }
+
+        Debug.Log(GoogleDriveTools.FileList().Count);
     }
 
     public void OnEnterClick()
     {
-
+        _enteredText.text = _textField.text;
+        _enteredNums.text = _numField.text;
     }
 
     public void OnSaveClick()

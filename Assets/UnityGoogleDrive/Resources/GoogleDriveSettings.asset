@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: GoogleDriveSettings
   m_EditorClassIdentifier: 
   genericClientCredentials:
-    client_id: 271663562255-3am9a042ult18ggb2c8g8in62qu2ap01.apps.googleusercontent.com
+    client_id: 271663562255-mbummvlbu9tr6lmimtj8ovgn8o2effda.apps.googleusercontent.com
     project_id: middle-471706
     auth_uri: https://accounts.google.com/o/oauth2/auth
     token_uri: https://oauth2.googleapis.com/token
     auth_provider_x509_cert_url: https://www.googleapis.com/oauth2/v1/certs
-    client_secret: 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
+    client_secret: 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
     redirect_uris:
-    - https://localhost
+    - http://localhost
   uriSchemeClientCredentials:
     clientId: 
     reversedClientId: 
