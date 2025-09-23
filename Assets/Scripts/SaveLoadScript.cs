@@ -1,6 +1,9 @@
+п»їusing System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityGoogleDrive;
 
 public class SaveLoadScript : MonoBehaviour
 {
@@ -10,20 +13,10 @@ public class SaveLoadScript : MonoBehaviour
     [SerializeField] private Text _enteredText;
     [SerializeField] private Text _enteredNums;
     [SerializeField] private Text _loadedText;
-    [SerializeField] private Text _loadedNums;
-    [SerializeField] private Text _gdLoadedText;
-    [SerializeField] private Text _gdLoadedNums;
+    [SerializeField] private Text _loadedNums;   
 
+    [SerializeField] private string _fileName;
     private string _filePath;
-
-    private void Start()
-    {
-        _filePath = Path.Combine(Application.persistentDataPath, "gameData.json");
-
-        CheckData();
-
-        //Debug.Log(GoogleDriveTools.FileList().Count);
-    }
 
     public void OnEnterClick()
     {
@@ -33,66 +26,87 @@ public class SaveLoadScript : MonoBehaviour
             _enteredNums.text = _numField.text;
         }
         else
-            Debug.Log("Заполните все поля!");
+            Debug.Log("Р—Р°РїРѕР»РЅРёС‚Рµ РІСЃРµ РїРѕР»СЏ!");
         
     }
 
     public void OnSaveClick()
     {
         SaveData();
-
-        GoogleDriveTools.Upload(_filePath);
-        
-        Debug.Log("Saved");
     }
 
     public void OnLoadClick()
     {
         LoadData();
-    }
+    }    
 
     private void SaveData()
     {
-        GameData gameData = new GameData();
-
         if (_enteredText.text != "" && _enteredNums.text != "")
         {
+            GameData gameData = new GameData();
+
             gameData.SavedText = _enteredText.text;
             gameData.SavedNums = _enteredNums.text;
 
             string json = JsonUtility.ToJson(gameData, true);
 
-            File.WriteAllText(_filePath, json);
-        }
+            var file = new UnityGoogleDrive.Data.File()
+            {
+                Name = _fileName,
+                Content = System.Text.Encoding.UTF8.GetBytes(json)
+            };
 
+            GoogleDriveFiles.Create(file).Send();
+
+            Debug.Log("Saved");
+        }
+        else
+            Debug.Log("РќРµ РІСЃРµ РїРѕР»СЏ Р·Р°РїРѕР»РЅРµРЅС‹");
     }
 
     private void LoadData()
     {
-        if (File.Exists(_filePath))
-        {
-            string json = File.ReadAllText(_filePath);
+        _filePath = Path.Combine(Application.persistentDataPath, _fileName);
 
-            GameData gameData = JsonUtility.FromJson<GameData>(json);
+        StartCoroutine(DownloadFromGoogleDrive());
+    }
+    
+    private void SetLoadData()
+    {
+        string jsonData = File.ReadAllText(_filePath);
+        
+        GameData gameData = new GameData();
 
-            _loadedText.text = gameData.SavedText;
-            _loadedNums.text = gameData.SavedNums;
-        }
+        gameData = JsonUtility.FromJson<GameData>(jsonData);
+
+        _loadedText.text = gameData.SavedText;
+        _loadedNums.text = gameData.SavedNums;
     }
 
-    private void CheckData()
+    private IEnumerator DownloadFromGoogleDrive()
     {
-        if (GoogleDriveTools.FileList().Count <= 0)
-        {
-            _gdLoadedText.text = "Данные отсутствуют";
-            _gdLoadedNums.text = "Данные отсутствуют";
-        }
-        else        
+        var listRequest = GoogleDriveFiles.List();
+        listRequest.Fields = new List<string> { "files(id, name)" };
+        listRequest.Q = $"name = '{_fileName}'";
 
-        if (!File.Exists(_filePath))
+        yield return listRequest.Send();
+
+        if (listRequest.ResponseData?.Files == null || listRequest.Fields.Count == 0)
         {
-            _loadedText.text = "Данные отсутствуют";
-            _loadedNums.text = "Данные отсутствуют";
-        }
+            _loadedText.text = "Р”Р°РЅРЅС‹Рµ РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚";
+            _loadedNums.text = "Р”Р°РЅРЅС‹Рµ РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚";
+
+            yield break;
+        }       
+
+        var fileId = listRequest.ResponseData.Files[0].Id;
+
+        var downloadRequest = GoogleDriveFiles.Download(fileId);
+        yield return downloadRequest.Send();
+
+        File.WriteAllBytes(_filePath, downloadRequest.ResponseData.Content);
+
+        SetLoadData();
     }
 }
