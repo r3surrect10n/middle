@@ -5,10 +5,13 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float _playerSpeed;
+    [SerializeField] private float _rotationSpeed;
 
     private CharacterController _controller;
 
     private Vector2 _movement;
+
+    private bool _isMoving;
 
     private void Start()
     {
@@ -19,20 +22,25 @@ public class PlayerMovement : MonoBehaviour
     {
         _movement = callbackContext.ReadValue<Vector2>();
 
-        if (callbackContext.performed)
+        if (callbackContext.performed && _movement.magnitude > 0.1f)
         {
+            _isMoving = true;
+
             StopAllCoroutines();
             StartCoroutine(ContinousMovement());
         }
 
-        if (callbackContext.canceled)
-            StopAllCoroutines();
+        if (callbackContext.canceled || _movement.magnitude <= 0.1f)
+        {
+            _isMoving = false;
 
+            StopAllCoroutines();
+        }
     }
 
     private IEnumerator ContinousMovement()
     {
-        while (true)
+        while (_isMoving)
         {
             MoveCharacter();
             yield return new WaitForFixedUpdate();
@@ -41,7 +49,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void MoveCharacter()
     {
-        Vector3 motion = new Vector3(_movement.x * _playerSpeed * Time.deltaTime, 0f, _movement.y * _playerSpeed * Time.deltaTime);
+        Vector3 direction = new Vector3(_movement.x, Vector3.zero.y, _movement.y).normalized;
+
+        Vector3 motion = _playerSpeed * direction * Time.fixedDeltaTime;
+
+        Debug.Log(motion);
+
         _controller.Move(motion);
 
         CharacterRotation();
@@ -49,10 +62,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void CharacterRotation()
     {
-        // transform.Rotate(transform.rotation.x, _movement.x + _movement.y, transform.rotation.z);
+        Vector3 direction = new Vector3(_movement.x, Vector3.zero.y, _movement.y);
 
-        Vector2 targetRotationY = new Vector2(_movement.x, _movement.y);
+        Quaternion targetRotation = Quaternion.LookRotation(direction);
 
-        transform.localRotation = Quaternion.LookRotation(new Vector3(_movement.x, 0, _movement.y));
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _rotationSpeed * Time.fixedDeltaTime);        
     }
 }
